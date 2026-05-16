@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>消防員班表</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Helvetica Neue',Arial,sans-serif;background:#f5f5f5;min-height:100vh;padding:12px;}
+.app{max-width:480px;margin:0 auto;background:#fff;border-radius:16px;padding:16px;box-shadow:0 2px 12px rgba(0,0,0,0.08);}
+.hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.mtitle{font-size:18px;font-weight:600;color:#1a1a1a;}
+.nbtn{background:none;border:1px solid #ddd;border-radius:8px;width:32px;height:32px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;color:#333;}
+.nbtn:hover{background:#f0f0f0;}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;}
+.sc{background:#f8f8f8;border-radius:10px;padding:10px 8px;text-align:center;border:1px solid #eee;}
+.sn{font-size:20px;font-weight:700;color:#1a1a1a;}
+.sl{font-size:11px;color:#888;margin-top:2px;}
+.ss{font-size:10px;color:#aaa;margin-top:1px;}
+.sn.pos{color:#D32F2F;}
+.sn.neg{color:#388E3C;}
+.leg{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px;padding:8px;background:#f9f9f9;border-radius:8px;}
+.li{display:flex;align-items:center;gap:3px;font-size:9px;color:#666;}
+.ld{width:8px;height:8px;border-radius:2px;flex-shrink:0;}
+.cg{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
+.dh{text-align:center;font-size:11px;color:#999;padding:2px 0 6px;font-weight:500;}
+.dc{border-radius:8px;padding:4px 3px;min-height:62px;cursor:pointer;border:1.5px solid transparent;transition:transform 0.1s;}
+.dc:active{transform:scale(0.97);}
+.dc.emp{cursor:default;background:none!important;border-color:transparent!important;}
+.dc.sh{background:#BBDEFB;border-color:#90CAF9;}
+.dc.ro{background:#F5F5F5;border-color:#E0E0E0;}
+.dc.cp{background:#FFF9C4;border-color:#F0E060;}
+.dc.on{background:#C8E6C9;border-color:#A5D6A7;}
+.dc.lv{background:#FFE0B2;border-color:#FFCC80;}
+.dc.of{background:#E1BEE7;border-color:#CE93D8;}
+.dc.do{background:#FAFAFA;border-color:#E0E0E0;}
+.dc.t91{background:#F8BBD0;border-color:#F48FB1;}
+.dc.t92{background:#B2EBF2;border-color:#80DEEA;}
+.dc.tvc{background:#D1C4E9;border-color:#B39DDB;}
+.dc.ov{border-style:dashed;}
+.dc.hd{box-shadow:inset 0 0 0 2px #E53935;}
+.dn{font-size:12px;font-weight:600;color:#333;}
+.dc.sh .dn,.dc.t91 .dn{color:#0D47A1;}
+.dc.t92 .dn{color:#006064;}
+.dc.tvc .dn{color:#4A148C;}
+.dc.on .dn{color:#1B5E20;}
+.dc.cp .dn,.dc.lv .dn{color:#E65100;}
+.dc.of .dn{color:#4A148C;}
+.dc.do .dn{color:#777;}
+.tc{width:20px;height:20px;border-radius:50%;background:#333;display:inline-flex;align-items:center;justify-content:center;}
+.tc .dn{color:#fff!important;font-size:10px;}
+.dl{font-size:9px;margin-top:1px;font-weight:600;}
+.dc.sh .dl{color:#0D47A1;}
+.dc.t91 .dl{color:#880E4F;}
+.dc.t92 .dl{color:#006064;}
+.dc.tvc .dl{color:#4A148C;}
+.dc.ro .dl{color:#999;}
+.dc.cp .dl,.dc.lv .dl{color:#E65100;}
+.dc.on .dl{color:#1B5E20;}
+.dc.of .dl{color:#4A148C;}
+.dc.do .dl{color:#999;}
+.dn2{font-size:8px;color:#E53935;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600;}
+.dn3{font-size:8px;color:#888;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+/* modal */
+.ovl{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;display:flex;align-items:flex-end;justify-content:center;padding:0;}
+.mdl{background:#fff;border-radius:20px 20px 0 0;padding:20px 16px 32px;width:100%;max-width:480px;max-height:88vh;overflow-y:auto;}
+.mhdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+.mt{font-size:16px;font-weight:700;color:#1a1a1a;}
+.xbtn{background:none;border:none;cursor:pointer;color:#999;font-size:22px;line-height:1;}
+.sec{margin-bottom:14px;}
+.lbl{font-size:11px;color:#999;font-weight:600;letter-spacing:0.05em;margin-bottom:6px;text-transform:uppercase;}
+.sgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;}
+.sb{padding:8px 4px;border:1.5px solid #e0e0e0;border-radius:10px;cursor:pointer;font-size:11px;text-align:center;background:#f8f8f8;color:#666;}
+.sb.a-sh{background:#BBDEFB;border-color:#90CAF9;color:#0D47A1;font-weight:700;}
+.sb.a-ro{background:#F5F5F5;border-color:#999;color:#333;font-weight:700;}
+.sb.a-cp{background:#FFF9C4;border-color:#F0E060;color:#E65100;font-weight:700;}
+.sb.a-on{background:#C8E6C9;border-color:#A5D6A7;color:#1B5E20;font-weight:700;}
+.sb.a-lv{background:#FFE0B2;border-color:#FFCC80;color:#E65100;font-weight:700;}
+.sb.a-of{background:#E1BEE7;border-color:#CE93D8;color:#4A148C;font-weight:700;}
+.sb.a-do{background:#FAFAFA;border-color:#aaa;color:#555;font-weight:700;}
+.trow{display:flex;gap:6px;margin-top:6px;}
+.tb{flex:1;padding:8px 4px;border:1.5px solid #e0e0e0;border-radius:10px;cursor:pointer;font-size:12px;text-align:center;background:#f8f8f8;color:#666;font-weight:500;}
+.tb.a91{background:#F8BBD0;border-color:#F48FB1;color:#880E4F;font-weight:700;}
+.tb.a92{background:#B2EBF2;border-color:#80DEEA;color:#006064;font-weight:700;}
+.tb.avc{background:#D1C4E9;border-color:#B39DDB;color:#4A148C;font-weight:700;}
+.timr{display:flex;align-items:center;gap:8px;margin-top:8px;}
+.timr input{flex:1;padding:8px;border:1px solid #ddd;border-radius:8px;font-size:13px;background:#f8f8f8;}
+.timr span{font-size:13px;color:#999;}
+.ni{width:100%;padding:10px;border:1px solid #ddd;border-radius:10px;font-size:14px;background:#f8f8f8;resize:none;font-family:inherit;}
+.svbtn{width:100%;padding:14px;background:#1a1a1a;color:#fff;border:none;border-radius:12px;cursor:pointer;font-size:15px;font-weight:700;margin-top:6px;}
+.svbtn:hover{background:#333;}
+.rlnk{font-size:12px;color:#aaa;cursor:pointer;text-decoration:underline;text-align:center;display:block;margin-top:10px;}
+.hbadge{font-size:12px;color:#E53935;font-weight:600;margin-bottom:10px;padding:6px 10px;background:#FFEBEE;border-radius:8px;}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="hdr">
+  <button class="nbtn" onclick="chM(-1)">&#8249;</button>
+  <div class="mtitle" id="mtitle"></div>
+  <button class="nbtn" onclick="chM(1)">&#8250;</button>
+</div>
+<div class="stats" id="stats"></div>
+<div class="leg">
+  <div class="li"><div class="ld" style="background:#BBDEFB;border:1px solid #90CAF9"></div>上班22h</div>
+  <div class="li"><div class="ld" style="background:#F5F5F5;border:1px solid #CCC"></div>輪休0h</div>
+  <div class="li"><div class="ld" style="background:#FFF9C4;border:1px solid #F0E060"></div>補休12h</div>
+  <div class="li"><div class="ld" style="background:#C8E6C9;border:1px solid #A5D6A7"></div>外宿12h</div>
+  <div class="li"><div class="ld" style="background:#FFE0B2;border:1px solid #FFCC80"></div>特休0h</div>
+  <div class="li"><div class="ld" style="background:#E1BEE7;border:1px solid #CE93D8"></div>公假12h</div>
+  <div class="li"><div class="ld" style="background:#FAFAFA;border:1px solid #CCC"></div>休假8h</div>
+  <div class="li"><div class="ld" style="background:#F8BBD0;border:1px solid #F48FB1"></div>91班</div>
+  <div class="li"><div class="ld" style="background:#B2EBF2;border:1px solid #80DEEA"></div>92班</div>
+  <div class="li"><div class="ld" style="background:#D1C4E9;border:1px solid #B39DDB"></div>值宿</div>
+  <div class="li"><div class="ld" style="background:none;border:2px solid #E53935;border-radius:3px"></div>國定假日</div>
+</div>
+<div class="cg" id="cal"></div>
+</div>
+
+<div class="ovl" id="ovl" style="display:none" onclick="closeM(event)">
+<div class="mdl" onclick="event.stopPropagation()">
+  <div class="mhdr">
+    <div class="mt" id="mdate"></div>
+    <button class="xbtn" onclick="closeM()">&times;</button>
+  </div>
+  <div id="hbadge" class="hbadge" style="display:none"></div>
+  <div class="sec">
+    <div class="lbl">班別狀態</div>
+    <div class="sgrid" id="sgrid"></div>
+  </div>
+  <div class="sec" id="tsec" style="display:none">
+    <div class="lbl">上班任務（選填）</div>
+    <div class="trow" id="trow"></div>
+    <div class="timr" id="timr" style="display:none">
+      <input type="time" id="ts">
+      <span>—</span>
+      <input type="time" id="te">
+    </div>
+  </div>
+  <div class="sec">
+    <div class="lbl">私人行程</div>
+    <textarea class="ni" id="note" rows="2" placeholder="爬山、聚餐、看診…"></textarea>
+  </div>
+  <button class="svbtn" onclick="saveD()">儲存</button>
+  <span class="rlnk" onclick="resetD()">還原預設班表</span>
+</div>
+</div>
+
+<script>
+const ANC={y:2025,m:2,d:27};
+const HD={
+  '2025-01-01':'元旦','2025-01-27':'春節','2025-01-28':'春節','2025-01-29':'春節',
+  '2025-01-30':'春節','2025-01-31':'春節','2025-02-28':'和平紀念日',
+  '2025-04-03':'兒童節補假','2025-04-04':'清明/兒童節','2025-05-01':'勞動節',
+  '2025-05-30':'端午補假','2025-05-31':'端午節','2025-10-10':'國慶日',
+  '2026-01-01':'元旦','2026-02-16':'春節','2026-02-17':'春節','2026-02-18':'春節',
+  '2026-02-19':'春節','2026-02-20':'春節','2026-02-28':'和平紀念日',
+  '2026-04-03':'兒童節','2026-04-04':'清明節','2026-04-06':'清明補假',
+  '2026-05-01':'勞動節','2026-06-19':'端午節','2026-09-26':'中秋節',
+  '2026-10-09':'國慶補假','2026-10-10':'國慶日'
+};
+function hk(y,m,d){return y+'-'+String(m).padStart(2,'0')+'-'+String(d).padStart(2,'0');}
+function isHD(y,m,d){return!!HD[hk(y,m,d)];}
+function hdN(y,m,d){return HD[hk(y,m,d)]||'';}
+
+const STS=[
+  {k:'sh',lb:'上班',h:22},{k:'ro',lb:'輪休',h:0},{k:'cp',lb:'補休',h:12},
+  {k:'on',lb:'外宿',h:12},{k:'lv',lb:'特休',h:0},{k:'of',lb:'公假',h:12},{k:'do',lb:'休假',h:8}
+];
+const TKS=[{k:'91',lb:'91班',cls:'a91'},{k:'92',lb:'92班',cls:'a92'},{k:'vc',lb:'值宿',cls:'avc'}];
+const HRS={sh:22,ro:0,cp:12,on:12,lv:0,of:12,do:8};
+
+let cur={y:new Date().getFullYear(),m:new Date().getMonth()+1};
+let ov={},ed=null,es={};
+
+function phase(y,m,d){
+  var a=new Date(ANC.y,ANC.m-1,ANC.d),t=new Date(y,m-1,d);
+  return(((Math.round((t-a)/86400000))%4)+4)%4;
+}
+function defS(y,m,d){return phase(y,m,d)<2?'sh':'ro';}
+function effS(d){return(ov[d]&&ov[d].s)||defS(cur.y,cur.m,d);}
+function effT(d){return(ov[d]&&ov[d].t)||null;}
+
+function stK(y,m){return'fsc-'+y+'-'+m;}
+function loadM(y,m){
+  try{var r=localStorage.getItem(stK(y,m));return r?JSON.parse(r):{};}
+  catch(e){return{};}
+}
+function saveM(y,m,data){
+  try{localStorage.setItem(stK(y,m),JSON.stringify(data));}catch(e){}
+}
+
+function chM(d){cur.m+=d;if(cur.m>12){cur.m=1;cur.y++;}if(cur.m<1){cur.m=12;cur.y--;}render();}
+
+function stLb(k){for(var i=0;i<STS.length;i++){if(STS[i].k===k)return STS[i].lb;}return'';}
+
+function calcSt(){
+  var dim=new Date(cur.y,cur.m,0).getDate(),tot=0,nd=0;
+  for(var d=1;d<=dim;d++){tot+=HRS[effS(d)]||0;}
+  for(var d=1;d<=dim;d++){
+    var dow=new Date(cur.y,cur.m-1,d).getDay();
+    if(dow>=1&&dow<=5&&!isHD(cur.y,cur.m,d))nd++;
+  }
+  return{tot:tot,nd:nd,nH:nd*8,ot:tot-nd*8};
+}
+
+function renderSt(){
+  var st=calcSt();
+  var oc=st.ot>=0?'pos':'neg',os=st.ot>=0?'+':'';
+  document.getElementById('stats').innerHTML=
+    '<div class="sc"><div class="sn">'+st.tot+'h</div><div class="sl">當月總工時</div></div>'+
+    '<div class="sc"><div class="sn">'+st.nH+'h</div><div class="sl">一般勞工工時</div><div class="ss">'+st.nd+'天 x 8h</div></div>'+
+    '<div class="sc"><div class="sn '+oc+'">'+os+st.ot+'h</div><div class="sl">加班時數</div></div>';
+}
+
+function render(){
+  ov=loadM(cur.y,cur.m);
+  document.getElementById('mtitle').textContent=cur.y+' 年 '+cur.m+' 月';
+  renderSt();
+  var cal=document.getElementById('cal');
+  cal.innerHTML='';
+  var days=['日','一','二','三','四','五','六'];
+  for(var i=0;i<7;i++){
+    var e=document.createElement('div');e.className='dh';e.textContent=days[i];cal.appendChild(e);
+  }
+  var first=new Date(cur.y,cur.m-1,1).getDay();
+  for(var i=0;i<first;i++){var e=document.createElement('div');e.className='dc emp';cal.appendChild(e);}
+  var dim=new Date(cur.y,cur.m,0).getDate();
+  var today=new Date();
+  for(var d=1;d<=dim;d++){
+    var s=effS(d),task=effT(d),o=ov[d];
+    var hday=isHD(cur.y,cur.m,d),hn=hdN(cur.y,cur.m,d);
+    var dispCls=task?'t'+task:s;
+    var cell=document.createElement('div');
+    cell.className='dc '+dispCls+(o?' ov':'')+(hday?' hd':'');
+    (function(dd){cell.onclick=function(){openM(dd);};})(d);
+    var isTod=today.getFullYear()===cur.y&&today.getMonth()+1===cur.m&&today.getDate()===d;
+    var numH=isTod?'<div class="tc"><span class="dn">'+d+'</span></div>':'<span class="dn">'+d+'</span>';
+    var lbl='';
+    if(task){lbl='<div class="dl">'+task+'班</div>';}
+    else if(s!=='ro'){lbl='<div class="dl">'+stLb(s)+'</div>';}
+    var hdH=hday?'<div class="dn2">'+hn+'</div>':'';
+    var tmH=(o&&o.ts)?'<div class="dn3">'+o.ts+'–'+(o.te||'?')+'</div>':'';
+    var ntH=(o&&o.n)?'<div class="dn3">'+o.n+'</div>':'';
+    cell.innerHTML=numH+lbl+hdH+tmH+ntH;
+    cal.appendChild(cell);
+  }
+}
+
+function openM(d){
+  ed=d;
+  var o=ov[d]||{};
+  es={s:o.s||defS(cur.y,cur.m,d),t:o.t||null,ts:o.ts||'',te:o.te||'',n:o.n||''};
+  var hday=isHD(cur.y,cur.m,d);
+  document.getElementById('mdate').textContent=cur.y+' 年 '+cur.m+' 月 '+d+' 日';
+  var hb=document.getElementById('hbadge');
+  hb.style.display=hday?'':'none';
+  if(hday)hb.textContent='國定假日：'+hdN(cur.y,cur.m,d);
+  document.getElementById('note').value=es.n;
+  document.getElementById('ts').value=es.ts;
+  document.getElementById('te').value=es.te;
+  refM();
+  document.getElementById('ovl').style.display='flex';
+}
+
+function refM(){
+  var sg=document.getElementById('sgrid');
+  sg.innerHTML='';
+  STS.forEach(function(x){
+    var btn=document.createElement('button');
+    var sel=es.s===x.k;
+    btn.className='sb'+(sel?' a-'+x.k:'');
+    btn.innerHTML=x.lb+'<br><span style="font-size:9px;opacity:0.7">'+x.h+'h</span>';
+    (function(k){btn.onclick=function(){es.s=k;refM();};})(x.k);
+    sg.appendChild(btn);
+  });
+  var isShift=es.s==='sh';
+  document.getElementById('tsec').style.display=isShift?'':'none';
+  if(isShift){
+    var tr=document.getElementById('trow');
+    tr.innerHTML='';
+    TKS.forEach(function(x){
+      var btn=document.createElement('button');
+      var sel=es.t===x.k;
+      btn.className='tb'+(sel?' '+x.cls:'');
+      btn.textContent=x.lb;
+      (function(k){btn.onclick=function(){es.t=es.t===k?null:k;refM();};})(x.k);
+      tr.appendChild(btn);
+    });
+    document.getElementById('timr').style.display=es.t?'flex':'none';
+  }
+}
+
+function saveD(){
+  es.ts=document.getElementById('ts').value;
+  es.te=document.getElementById('te').value;
+  es.n=document.getElementById('note').value.trim();
+  var def=defS(cur.y,cur.m,ed);
+  if(es.s===def&&!es.t&&!es.ts&&!es.n){delete ov[ed];}
+  else{ov[ed]={s:es.s,t:es.t,ts:es.ts,te:es.te,n:es.n};}
+  saveM(cur.y,cur.m,ov);
+  closeM();
+  render();
+}
+
+function resetD(){
+  delete ov[ed];
+  saveM(cur.y,cur.m,ov);
+  closeM();
+  render();
+}
+
+function closeM(e){
+  if(!e||e.target===document.getElementById('ovl')){
+    document.getElementById('ovl').style.display='none';
+  }
+}
+
+render();
+</script>
+</body>
+</html>
