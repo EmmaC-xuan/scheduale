@@ -325,6 +325,7 @@ function refM(){
     (function(k){btn.onclick=function(){
       var wasDefault=parseInt(document.getElementById('day-hrs').value)===(HRS[es.s]||0);
       es.s=k;
+      if(k!=='sh'){es.t=null;es.ts='';es.te='';}
       if(wasDefault){
         document.getElementById('day-hrs').value=HRS[k]||0;
       }
@@ -335,6 +336,10 @@ function refM(){
   });
   var isShift=es.s==='sh';
   document.getElementById('tsec').style.display=isShift?'':'none';
+  if(!isShift){
+    document.getElementById('ts').value='';
+    document.getElementById('te').value='';
+  }
   if(isShift){
     var tr=document.getElementById('trow');
     tr.innerHTML='';
