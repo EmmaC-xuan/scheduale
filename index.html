@@ -12,11 +12,11 @@ body{font-family:'Helvetica Neue',Arial,sans-serif;background:#f5f5f5;min-height
 .mtitle{font-size:18px;font-weight:600;color:#1a1a1a;}
 .nbtn{background:none;border:1px solid #ddd;border-radius:8px;width:32px;height:32px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;color:#333;}
 .nbtn:hover{background:#f0f0f0;}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;}
-.sc{background:#f8f8f8;border-radius:10px;padding:10px 8px;text-align:center;border:1px solid #eee;}
-.sn{font-size:20px;font-weight:700;color:#1a1a1a;}
-.sl{font-size:11px;color:#888;margin-top:2px;}
-.ss{font-size:10px;color:#aaa;margin-top:1px;}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:14px;}
+.sc{background:#f8f8f8;border-radius:8px;padding:6px 4px;text-align:center;border:1px solid #eee;}
+.sn{font-size:14px;font-weight:700;color:#1a1a1a;}
+.sl{font-size:9px;color:#888;margin-bottom:2px;}
+.ss{font-size:9px;color:#aaa;margin-top:1px;}
 .sn.pos{color:#D32F2F;}
 .sn.neg{color:#388E3C;}
 .leg{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px;padding:8px;background:#f9f9f9;border-radius:8px;}
@@ -27,6 +27,7 @@ body{font-family:'Helvetica Neue',Arial,sans-serif;background:#f5f5f5;min-height
 .dc{border-radius:8px;padding:4px 3px;min-height:62px;cursor:pointer;border:1.5px solid transparent;transition:transform 0.1s;}
 .dc:active{transform:scale(0.97);}
 .dc.emp{cursor:default;background:none!important;border-color:transparent!important;}
+.dtop{display:flex;align-items:center;gap:3px;flex-wrap:wrap;}
 .dc.sh{background:#BBDEFB;border-color:#90CAF9;}
 .dc.ro{background:#F5F5F5;border-color:#E0E0E0;}
 .dc.cp{background:#FFF9C4;border-color:#F0E060;}
@@ -49,7 +50,7 @@ body{font-family:'Helvetica Neue',Arial,sans-serif;background:#f5f5f5;min-height
 .dc.do .dn{color:#777;}
 .tc{width:20px;height:20px;border-radius:50%;background:#333;display:inline-flex;align-items:center;justify-content:center;}
 .tc .dn{color:#fff!important;font-size:10px;}
-.dl{font-size:9px;margin-top:1px;font-weight:600;}
+.dl{font-size:9px;font-weight:600;}
 .dc.sh .dl{color:#0D47A1;}
 .dc.t91 .dl{color:#880E4F;}
 .dc.t92 .dl{color:#006064;}
@@ -101,7 +102,6 @@ body{font-family:'Helvetica Neue',Arial,sans-serif;background:#f5f5f5;min-height
   <div class="mtitle" id="mtitle"></div>
   <button class="nbtn" onclick="chM(1)">&#8250;</button>
 </div>
-<div class="stats" id="stats"></div>
 <div class="leg">
   <div class="li"><div class="ld" style="background:#BBDEFB;border:1px solid #90CAF9"></div>上班22h</div>
   <div class="li"><div class="ld" style="background:#F5F5F5;border:1px solid #CCC"></div>輪休0h</div>
@@ -116,6 +116,7 @@ body{font-family:'Helvetica Neue',Arial,sans-serif;background:#f5f5f5;min-height
   <div class="li"><div class="ld" style="background:none;border:2px solid #E53935;border-radius:3px"></div>國定假日</div>
 </div>
 <div class="cg" id="cal"></div>
+<div class="stats" id="stats"></div>
 </div>
 
 <div class="ovl" id="ovl" style="display:none" onclick="closeM(event)">
@@ -148,7 +149,7 @@ body{font-family:'Helvetica Neue',Arial,sans-serif;background:#f5f5f5;min-height
 </div>
 
 <script>
-const ANC={y:2025,m:2,d:27};
+const ANC={y:2026,m:5,d:2};
 const HD={
   '2025-01-01':'元旦','2025-01-27':'春節','2025-01-28':'春節','2025-01-29':'春節',
   '2025-01-30':'春節','2025-01-31':'春節','2025-02-28':'和平紀念日',
@@ -209,9 +210,9 @@ function renderSt(){
   var st=calcSt();
   var oc=st.ot>=0?'pos':'neg',os=st.ot>=0?'+':'';
   document.getElementById('stats').innerHTML=
-    '<div class="sc"><div class="sn">'+st.tot+'h</div><div class="sl">當月總工時</div></div>'+
-    '<div class="sc"><div class="sn">'+st.nH+'h</div><div class="sl">一般勞工工時</div><div class="ss">'+st.nd+'天 x 8h</div></div>'+
-    '<div class="sc"><div class="sn '+oc+'">'+os+st.ot+'h</div><div class="sl">加班時數</div></div>';
+    '<div class="sc"><div class="sl">當月總工時</div><div class="sn">'+st.tot+'</div></div>'+
+    '<div class="sc"><div class="sl">一般勞工工時</div><div class="sn">'+st.nH+'</div><div class="ss">'+st.nd+'天 x 8h</div></div>'+
+    '<div class="sc"><div class="sl">加班時數</div><div class="sn '+oc+'">'+os+st.ot+'</div></div>';
 }
 
 function render(){
@@ -238,12 +239,12 @@ function render(){
     var isTod=today.getFullYear()===cur.y&&today.getMonth()+1===cur.m&&today.getDate()===d;
     var numH=isTod?'<div class="tc"><span class="dn">'+d+'</span></div>':'<span class="dn">'+d+'</span>';
     var lbl='';
-    if(task){lbl='<div class="dl">'+task+'班</div>';}
-    else if(s!=='ro'){lbl='<div class="dl">'+stLb(s)+'</div>';}
+    if(task){lbl='<span class="dl">'+task+'班</span>';}
+    else if(s!=='ro'){lbl='<span class="dl">'+stLb(s)+'</span>';}
     var hdH=hday?'<div class="dn2">'+hn+'</div>':'';
     var tmH=(o&&o.ts)?'<div class="dn3">'+o.ts+'–'+(o.te||'?')+'</div>':'';
     var ntH=(o&&o.n)?'<div class="dn3">'+o.n+'</div>':'';
-    cell.innerHTML=numH+lbl+hdH+tmH+ntH;
+    cell.innerHTML='<div class="dtop">'+numH+lbl+'</div>'+hdH+tmH+ntH;
     cal.appendChild(cell);
   }
 }
